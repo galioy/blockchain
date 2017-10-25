@@ -1,5 +1,7 @@
 'use strict';
+
 const crypto = require('crypto');
+const urlParse = require('url-parse');
 
 class Blockchain {
   constructor() {
@@ -107,12 +109,14 @@ class Blockchain {
   }
 
   /**
-   * Add a new node to the list of nodes in the Blockchain
+   * Add a new node to the list of nodes in the Blockchain.
+   * Eg,`address` is 'http://192.168.0.5:5000', then '192.168.0.5' will be added to the nodes list.
    *
-   * @param {string}  address The address of the node, eg. 'http://192.168.0.5:5000'
+   * @param {string}  address The address of the node
    */
   registerNode(address) {
-
+    const url = urlParse(address);
+    this.nodes.add(url.hostname);
   }
 
   /**
@@ -146,6 +150,8 @@ class Blockchain {
 
     return true;
   }
+
+  resolveConflicts()
 }
 
 module.exports = Blockchain;
