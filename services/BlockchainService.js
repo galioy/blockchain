@@ -6,6 +6,7 @@ class Blockchain {
     this.chain = [];
     this.currentTransactions = [];
     this.newBlock(100, 1); // create the genesis block
+    this.nodes = new Set();
   }
 
   /**
@@ -65,6 +66,11 @@ class Blockchain {
     });
   }
 
+  /**
+   * Returns the last block in the Blockchain
+   *
+   * @return {object} The last block as an object, containing id, timestamp, list of txs, etc
+   */
   lastBlock() {
     return this.chain[this.chain.length - 1];
   }
@@ -98,6 +104,47 @@ class Blockchain {
     const guess = Buffer.from(`${lastProof}${proof}`).toString('base64');
     const guessHash = crypto.createHash('sha256').update(guess).digest('hex');
     return guessHash.substr(0, 4) === '0000';
+  }
+
+  /**
+   * Add a new node to the list of nodes in the Blockchain
+   *
+   * @param {string}  address The address of the node, eg. 'http://192.168.0.5:5000'
+   */
+  registerNode(address) {
+
+  }
+
+  /**
+   * Determines if a given blockchain is valid
+   *
+   * @param {array}  chain A blockchain as a list of blocks
+   * @return {boolean} True if valid, False otherwise
+   */
+  isValidChain(chain) {
+    let lastBlock = chain[0];
+    let currentIndex = 1;
+
+    while (currentIndex < chain.length) {
+      const block = chain[currentIndex];
+      console.log(lastBlock);
+      console.log(block);
+
+      // Check that the hash of the block is correct
+      if (block.previousHash !== Blockchain.hash(lastBlock)) {
+        return false;
+      }
+
+      // Check that the Proof of Work is correct
+      if (!Blockchain.isValidProof(lastBlock.proof, block.proof)) {
+        return false;
+      }
+
+      lastBlock = block;
+      currentIndex++;
+    }
+
+    return true;
   }
 }
 
