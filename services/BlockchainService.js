@@ -2,6 +2,7 @@
 
 const crypto = require('crypto');
 const urlParse = require('url-parse');
+const request = require('request');
 
 class Blockchain {
   constructor() {
@@ -151,7 +152,35 @@ class Blockchain {
     return true;
   }
 
-  resolveConflicts()
+  /**
+   * This is the Consensus algorithm. It resolves conflicts between the nodes by replacing our blockchain
+   * with the longest one in the network, as it's considered to be the "truest".
+   *
+   * @return {boolean} True if the chain was replaced, False otherwise
+   */
+  resolveConflicts() {
+    const neighbours = this.nodes;
+    let newChain;
+
+    // We only look for chains that are longer than ours
+    const maxLength = this.chain.length;
+
+    // Grab and verify the chains from all the nodes in our network
+    neighbours.forEach((node) => {
+      request(`http://${node}/chain`)
+        .then((err, res, body) => {
+          console.log('======= ERR =========');
+          console.log(err);
+          console.log('======= ERR =========');
+          console.log(res);
+          console.log('======= ERR =========');
+          console.log(body);
+          if (res.statusCode == 200) {
+
+          }
+        })
+    });
+  }
 }
 
 module.exports = Blockchain;
