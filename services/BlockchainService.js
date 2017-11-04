@@ -166,7 +166,7 @@ class Blockchain {
 
     // Grab and verify the chains from all the nodes in our network
     neighbours.forEach((node) => {
-      reqPromises.push(request(`http://${node}/blockchain/chain`));
+      reqPromises.push(request(`http://${node}/chain`));
     });
 
     return Promise.all(reqPromises)
