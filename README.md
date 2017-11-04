@@ -3,7 +3,7 @@ Just a self-made implementation of a Blockchain, with the purpose to understand 
 
 # API
 
-#### Get the blockchain of the current node
+### Get the blockchain of the current node
 Returns the Blockchain of the current node.
 
 *Request:*
@@ -44,7 +44,7 @@ Returns the Blockchain of the current node.
 }
 ```
 
-#### Create a new transaction
+### Create a new transaction
 Registers a new transaction in the current node's Blockchain, that will be added to the next mined block.
 
 *Request:*
@@ -64,7 +64,7 @@ Registers a new transaction in the current node's Blockchain, that will be added
 "New transaction will be added to block 2"
 ```
 
-#### Mine a new block
+### Mine a new block
 Mines a new block in the current node's Blockchain.
 
 *Request:*
@@ -93,7 +93,7 @@ Mines a new block in the current node's Blockchain.
 }
 ```
 
-#### Register a new node
+### Register a new node
 Registers a new node (obviously...).
 
 NOTE: You have to have another server instance running for each node.
@@ -121,7 +121,7 @@ Pass the URL + port of the instance.
 }
 ```
 
-#### Resolve the nodes' blockchains
+### Resolve the nodes' Blockchains
 The node with the longest Blockchain is the authoritative.
 
 *Request:*
