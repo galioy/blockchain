@@ -2,7 +2,7 @@
 
 const crypto = require('crypto');
 const urlParse = require('url-parse');
-const request = require('request');
+const request = require('request-promise');
 
 class Blockchain {
   constructor() {
@@ -117,7 +117,7 @@ class Blockchain {
    */
   registerNode(address) {
     const url = urlParse(address);
-    this.nodes.add(url.hostname);
+    this.nodes.add(url.host);
   }
 
   /**
@@ -134,6 +134,7 @@ class Blockchain {
       const block = chain[currentIndex];
       console.log(lastBlock);
       console.log(block);
+      console.log('\n============================\n');
 
       // Check that the hash of the block is correct
       if (block.previousHash !== Blockchain.hash(lastBlock)) {
@@ -160,26 +161,40 @@ class Blockchain {
    */
   resolveConflicts() {
     const neighbours = this.nodes;
-    let newChain;
-
-    // We only look for chains that are longer than ours
-    const maxLength = this.chain.length;
+    const requests = [];
+    let isReplaced = false;
 
     // Grab and verify the chains from all the nodes in our network
     neighbours.forEach((node) => {
-      request(`http://${node}/chain`)
-        .then((err, res, body) => {
-          console.log('======= ERR =========');
-          console.log(err);
-          console.log('======= ERR =========');
-          console.log(res);
-          console.log('======= ERR =========');
-          console.log(body);
-          if (res.statusCode == 200) {
+      // We only look for chains that are longer than ours
+      let maxLength = this.chain.length;
 
+      const promise = request(`http://${node}/blockchain/chain`)
+        .then((res) => {
+          res = JSON.parse(res);
+          if (res && res !== undefined) {
+            const length = res.length;
+            const chain = res.chain;
+
+            // If the chain we're iterating through is longer and is a valid chain - it becomes the new de facto chain
+            if (length > maxLength && this.isValidChain(chain)) {
+              maxLength = length;
+              this.chain = chain;
+              isReplaced = true;
+            }
           }
-        })
+        });
+
+      requests.push(promise);
     });
+
+    return Promise.all(requests)
+      .then(() => {
+        return isReplaced;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 }
 
