@@ -161,39 +161,35 @@ class Blockchain {
    */
   resolveConflicts() {
     const neighbours = this.nodes;
-    const requests = [];
+    const reqPromises = [];
     let isReplaced = false;
 
     // Grab and verify the chains from all the nodes in our network
     neighbours.forEach((node) => {
-      // We only look for chains that are longer than ours
-      let maxLength = this.chain.length;
+      reqPromises.push(request(`http://${node}/blockchain/chain`));
+    });
 
-      const promise = request(`http://${node}/blockchain/chain`)
-        .then((res) => {
+    return Promise.all(reqPromises)
+      .then((requests) => {
+        requests.forEach((res) => {
           res = JSON.parse(res);
+          
           if (res && res !== undefined) {
             const length = res.length;
             const chain = res.chain;
 
             // If the chain we're iterating through is longer and is a valid chain - it becomes the new de facto chain
-            if (length > maxLength && this.isValidChain(chain)) {
-              maxLength = length;
+            if (length > this.chain.length && this.isValidChain(chain)) {
               this.chain = chain;
               isReplaced = true;
             }
           }
         });
 
-      requests.push(promise);
-    });
-
-    return Promise.all(requests)
-      .then(() => {
-        return isReplaced;
+        return Promise.resolve(isReplaced);
       })
       .catch((err) => {
-        console.log(err);
+        return Promise.reject(new Error(err));
       });
   }
 }

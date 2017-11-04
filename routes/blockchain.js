@@ -78,20 +78,22 @@ router.post('/nodes/register', (req, res, next) => {
  * Resolve the conflicts between the chains in the nodes (run the Consensus algorithm)
  */
 router.get('/nodes/resolve', (req, res, next) => {
-  const replaced = blockchain.resolveConflicts();
   const response = {
     message: ''
   };
 
-  if (replaced) {
-    response.message = 'Our chain was replaced';
-    response.newChain = blockchain.chain;
-  } else {
-    response.message = 'Our chain is authoritative';
-    response.chain = blockchain.chain;
-  }
+  blockchain.resolveConflicts()
+    .then((isReplaced) => {
+      if (isReplaced) {
+        response.message = 'Our chain was replaced';
+        response.newChain = blockchain.chain;
+      } else {
+        response.message = 'Our chain is authoritative';
+        response.chain = blockchain.chain;
+      }
 
-  res.json(response);
+      res.json(response);
+    });
 });
 
 module.exports = router;
