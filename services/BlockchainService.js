@@ -173,7 +173,7 @@ class Blockchain {
       .then((requests) => {
         requests.forEach((res) => {
           res = JSON.parse(res);
-          
+
           if (res && res !== undefined) {
             const length = res.length;
             const chain = res.chain;
